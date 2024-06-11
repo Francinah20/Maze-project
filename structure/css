@@ -1,0 +1,12 @@
+maze_project/
+│
+├── src/
+│   ├── main.c
+│   ├── maze.c
+│   └── raycasting.c
+│
+└── inc/
+    ├── maze.h
+    ├── raycasting.h
+    └── sdl_utils.h
+

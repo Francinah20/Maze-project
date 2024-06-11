@@ -1,0 +1,44 @@
+typedef struct {
+    int x;
+    int y;
+} Enemy;
+
+void draw_enemy(SDL_Renderer *renderer, int player_x, int player_y, int enemy_x, int enemy_y);
+
+void render(SDL_Renderer *renderer, int camera_x, int camera_y, int camera_angle, int map[][SCREEN_HEIGHT], int map_width, int map_height, Enemy *enemies, int num_enemies)
+{
+    // Clear screen
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    // Draw ground and ceiling textures
+    draw_textured_rectangle(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 255, 0); // Draw green ground
+    draw_textured_rectangle(renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 0, 255); // Draw blue ceiling
+
+    // Draw walls using raycasting
+    cast_rays(renderer, camera_x, camera_y, camera_angle, map, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Draw enemies
+    for (int i = 0; i < num_enemies; i++) {
+        draw_enemy(renderer, camera_x, camera_y, enemies[i].x, enemies[i].y);
+    }
+
+    // Draw weapon
+    draw_weapon(renderer, camera_angle);
+
+    // Update screen
+    SDL_RenderPresent(renderer);
+}
+
+void draw_enemy(SDL_Renderer *renderer, int player_x, int player_y, int enemy_x, int enemy_y)
+{
+    // Draw a simple enemy representation (rectangle for now)
+    int enemy_size = 20;
+    int enemy_screen_x = enemy_x - player_x + SCREEN_WIDTH / 2;
+    int enemy_screen_y = enemy_y - player_y + SCREEN_HEIGHT / 2;
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_Rect enemyRect = {enemy_screen_x - enemy_size / 2, enemy_screen_y - enemy_size / 2, enemy_size, enemy_size};
+    SDL_RenderFillRect(renderer, &enemyRect);
+}
+

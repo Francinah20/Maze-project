@@ -1,0 +1,130 @@
+#include <stdio.h>
+#include <SDL2/SDL.h>
+#include "sdl_utils.h"
+#include "maze.h"
+#include "raycasting.h"
+
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
+#define MOVE_SPEED 5
+#define TURN_SPEED 5
+#define RAIN_MAX_DROPS 200
+
+typedef struct {
+    int x;
+    int y;
+    int speed;
+} Raindrop;
+
+void update_rain(Raindrop *raindrops);
+void draw_rain(SDL_Renderer *renderer, Raindrop *raindrops);
+
+int main()
+{
+    SDL_Window *window = init_window(SCREEN_WIDTH, SCREEN_HEIGHT, "Maze Raycasting");
+    if (!window) {
+        fprintf(stderr, "Failed to initialize SDL window\n");
+        return 1;
+    }
+
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        fprintf(stderr, "Failed to create renderer\n");
+        close_window(window);
+        return 1;
+    }
+
+    int map[SCREEN_WIDTH][SCREEN_HEIGHT];
+    // Initialize map with example data
+    for (int i = 0; i < SCREEN_HEIGHT; i++) {
+        for (int j = 0; j < SCREEN_WIDTH; j++) {
+            map[j][i] = (i == 0 || i == SCREEN_HEIGHT - 1 || j == 0 || j == SCREEN_WIDTH - 1) ? 1 : 0;
+        }
+    }
+
+    int camera_x = SCREEN_WIDTH / 2;
+    int camera_y = SCREEN_HEIGHT / 2;
+    int camera_angle = 0;
+
+    // Initialize raindrops
+    Raindrop raindrops[RAIN_MAX_DROPS];
+    for (int i = 0; i < RAIN_MAX_DROPS; i++) {
+        raindrops[i].x = rand() % SCREEN_WIDTH;
+        raindrops[i].y = rand() % SCREEN_HEIGHT;
+        raindrops[i].speed = 5 + rand() % 10;
+    }
+
+    // Flag to control rain
+    int rain_enabled = 1;
+
+    // Game loop
+    SDL_Event event;
+    int running = 1;
+    while (running) {
+        // Handle events
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT)
+                running = 0;
+            else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                    case SDLK_ESCAPE:
+                        running = 0;
+                        break;
+                    case SDLK_r:
+                        rain_enabled = !rain_enabled;
+                        break;
+                }
+            }
+        }
+
+        // Move the player and update rain
+        // ...
+
+        // Clear screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Draw ground and ceiling textures
+        draw_textured_rectangle(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 255, 0); // Draw green ground
+        draw_textured_rectangle(renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 0, 255); // Draw blue ceiling
+
+        // Draw walls using raycasting
+        cast_rays(renderer, camera_x, camera_y, camera_angle, map, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        // Draw rain
+        if (rain_enabled) {
+            update_rain(raindrops);
+            draw_rain(renderer, raindrops);
+        }
+
+        // Draw weapon
+        // ...
+
+        // Update screen
+        SDL_RenderPresent(renderer);
+    }
+
+    close_window(window);
+    SDL_DestroyRenderer(renderer);
+    SDL_Quit();
+
+    return 0;
+}
+
+void update_rain(Raindrop *raindrops)
+{
+    for (int i = 0; i < RAIN_MAX_DROPS; i++) {
+        raindrops[i].y += raindrops[i].speed;
+        if (raindrops[i].y > SCREEN_HEIGHT)
+            raindrops[i].y = 0; // Reset raindrop position if it reaches bottom
+    }
+}
+
+void draw_rain(SDL_Renderer *renderer, Raindrop *raindrops)
+{
+    SDL_SetRenderDrawColor(renderer, 200, 200, 255, 255); // Set raindrop color
+    for (int i = 0; i < RAIN_MAX_DROPS; i++) {
+        SDL_RenderDrawLine(renderer, raindrops[i].x, raindrops[i].y, raindrops[i].x, raindrops[i].y + 5); // Draw raindrop line
+    }
+}
+

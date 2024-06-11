@@ -1,0 +1,33 @@
+void render(SDL_Renderer *renderer, int camera_x, int camera_y, int camera_angle, int map[][SCREEN_HEIGHT], int map_width, int map_height)
+{
+    // Clear screen
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    // Draw ground and ceiling textures
+    draw_textured_rectangle(renderer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 255, 0); // Draw green ground
+    draw_textured_rectangle(renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2, 0, 0, 255); // Draw blue ceiling
+
+    // Draw walls using raycasting
+    cast_rays(renderer, camera_x, camera_y, camera_angle, map, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Draw weapon
+    draw_weapon(renderer, camera_angle);
+
+    // Update screen
+    SDL_RenderPresent(renderer);
+}
+
+void draw_weapon(SDL_Renderer *renderer, int camera_angle)
+{
+    // Draw a simple weapon representation (rectangle for now)
+    int weapon_width = 20;
+    int weapon_height = 100;
+    int weapon_x = SCREEN_WIDTH / 2 - weapon_width / 2;
+    int weapon_y = SCREEN_HEIGHT - weapon_height;
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_Rect weaponRect = {weapon_x, weapon_y, weapon_width, weapon_height};
+    SDL_RenderFillRect(renderer, &weaponRect);
+}
+

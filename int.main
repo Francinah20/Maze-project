@@ -1,0 +1,26 @@
+int main()
+{
+    // Initialization code...
+
+    // Initialize enemies
+    Enemy enemies[2]; // 
+    enemies[0].x = 40;
+    enemies[0].y = 30;
+    enemies[1].x = 60;
+    enemies[1].y = 20;
+
+    // Game loop
+    SDL_Event event;
+    int running = 1;
+    while (running) {
+        // Handle events...
+
+        // Rendering
+        render(renderer, camera_x, camera_y, camera_angle, map, SCREEN_WIDTH, SCREEN_HEIGHT, enemies, 2); // 2 enemies in this example
+    }
+
+    // Cleanup code...
+
+    return 0;
+}
+

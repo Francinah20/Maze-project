@@ -1,0 +1,19 @@
+int main()
+{
+    // Initialization code...
+
+    // Game loop
+    SDL_Event event;
+    int running = 1;
+    while (running) {
+        // Handle events...
+
+        // Rendering
+        render(renderer, camera_x, camera_y, camera_angle, map, SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
+
+    // Cleanup code...
+
+    return 0;
+}
+
